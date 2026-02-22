@@ -166,66 +166,74 @@ const state = {
 
 // ── Region definitions ─────────────────────────────────
 const regions = {
+  // Offset centers sector 0 at top by default: -(360/n)/2
+  // Driving uses offset 0 so sectors land at exact left (270°) and right (90°)
   climate: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--climate').trim(),
+    // 8 items, offset -22.5° → sectors at compass directions: ↑ ↗ → ↘ ↓ ↙ ← ↖
     options: [
-      { label: 'Temp +', icon: '🔺' },
-      { label: 'Temp −', icon: '🔻' },
-      { label: 'Fan +', icon: '💨' },
-      { label: 'Fan −', icon: '🌬' },
-      { label: 'Defrost F', icon: '▓' },
-      { label: 'Defrost R', icon: '▒' },
-      { label: 'AC', icon: '❄' },
-      { label: 'Auto', icon: 'Ⓐ' },
+      { label: 'Temp +', icon: '🔺' },   // ↑ up
+      { label: 'Fan +', icon: '💨' },     // ↗
+      { label: 'AC', icon: '❄' },         // → right
+      { label: 'Defrost F', icon: '▓' },  // ↘
+      { label: 'Temp −', icon: '🔻' },    // ↓ down
+      { label: 'Fan −', icon: '🌬' },     // ↙
+      { label: 'Auto', icon: 'Ⓐ' },      // ← left
+      { label: 'Defrost R', icon: '▒' },  // ↖
     ],
   },
   driving: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--driving').trim(),
+    offset: 0, // sectors centered at 30°, 90°, 150°, 210°, 270°, 330°
     options: [
-      { label: 'Left', icon: '◀' },
-      { label: 'Right', icon: '▶' },
-      { label: 'Hazards', icon: '⚠' },
-      { label: 'Headlights', icon: '💡' },
-      { label: 'High beam', icon: '🔆' },
-      { label: 'Wipers', icon: '🌧' },
+      { label: 'Headlights', icon: '💡' }, // ↗ upper-right
+      { label: 'Right', icon: '▶' },       // → right
+      { label: 'High beam', icon: '🔆' },  // ↘ lower-right
+      { label: 'Wipers', icon: '🌧' },     // ↙ lower-left
+      { label: 'Left', icon: '◀' },        // ← left
+      { label: 'Hazards', icon: '⚠' },     // ↖ upper-left
     ],
   },
   music: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--music').trim(),
+    // 6 items, offset -30° → sectors at 0°, 60°, 120°, 180°, 240°, 300°
     options: [
-      { label: 'Vol +', icon: '🔊' },
-      { label: 'Vol −', icon: '🔉' },
-      { label: 'Play/Pause', icon: '⏯' },
-      { label: 'Next', icon: '⏭' },
-      { label: 'Prev', icon: '⏮' },
-      { label: 'Source', icon: '📡' },
+      { label: 'Vol +', icon: '🔊' },      // ↑ up
+      { label: 'Next', icon: '⏭' },        // ↗ upper-right
+      { label: 'Source', icon: '📡' },      // ↘ lower-right
+      { label: 'Vol −', icon: '🔉' },       // ↓ down
+      { label: 'Prev', icon: '⏮' },        // ↙ lower-left
+      { label: 'Play/Pause', icon: '⏯' },  // ↖ upper-left
     ],
   },
   navigation: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--navigation').trim(),
+    // 4 items, offset -45° → sectors at ↑ → ↓ ←
     options: [
-      { label: 'Zoom in', icon: '🔍' },
-      { label: 'Zoom out', icon: '🔎' },
-      { label: 'Recenter', icon: '◎' },
-      { label: 'Nav audio', icon: '🔈' },
+      { label: 'Zoom in', icon: '🔍' },    // ↑ up
+      { label: 'Recenter', icon: '◎' },    // → right
+      { label: 'Zoom out', icon: '🔎' },   // ↓ down
+      { label: 'Nav audio', icon: '🔈' },  // ← left
     ],
   },
   doors: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--doors').trim(),
+    // 4 items, offset -45° → sectors at ↑ → ↓ ←
     options: [
-      { label: 'Lock all', icon: '🔒' },
-      { label: 'Unlock all', icon: '🔓' },
-      { label: 'Windows', icon: '⬇' },
-      { label: 'Trunk', icon: '📦' },
+      { label: 'Lock all', icon: '🔒' },   // ↑ up
+      { label: 'Unlock all', icon: '🔓' }, // → right
+      { label: 'Windows', icon: '⬇' },     // ↓ down
+      { label: 'Trunk', icon: '📦' },      // ← left
     ],
   },
   vehicle: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--vehicle').trim(),
+    // 4 items, offset -45° → sectors at ↑ → ↓ ←
     options: [
-      { label: 'Seat heat', icon: '🔥' },
-      { label: 'Mirrors', icon: '🪞' },
-      { label: 'Camera', icon: '📷' },
-      { label: 'Settings', icon: '⚙' },
+      { label: 'Seat heat', icon: '🔥' },  // ↑ up
+      { label: 'Camera', icon: '📷' },     // → right
+      { label: 'Settings', icon: '⚙' },   // ↓ down
+      { label: 'Mirrors', icon: '🪞' },    // ← left
     ],
   },
 };
@@ -295,7 +303,10 @@ function showPie(regionName, cx, cy) {
   const n = opts.length;
   const sliceAngle = 360 / n;
 
-  activePie = { region: regionName, cx, cy, options: opts, color: reg.color, highlighted: -1 };
+  // Offset: if region specifies one, use it; otherwise center sector 0 at top
+  const offset = reg.offset !== undefined ? reg.offset : -sliceAngle / 2;
+
+  activePie = { region: regionName, cx, cy, options: opts, color: reg.color, highlighted: -1, offset };
 
   // Clear SVG
   svg.innerHTML = '';
@@ -306,7 +317,7 @@ function showPie(regionName, cx, cy) {
   });
 
   for (let i = 0; i < n; i++) {
-    const startA = i * sliceAngle;
+    const startA = i * sliceAngle + offset;
     const endA = startA + sliceAngle;
     const d = sectorPath(cx, cy, INNER_R, OUTER_R, startA, endA);
 
@@ -402,13 +413,15 @@ function updateHighlight(px, py) {
     return;
   }
 
-  // Compute angle
-  let angle = Math.atan2(dx, -dy) * 180 / Math.PI; // 0 = up, clockwise
+  // Compute angle (0 = up, clockwise), then adjust for region offset
+  let angle = Math.atan2(dx, -dy) * 180 / Math.PI;
   if (angle < 0) angle += 360;
 
   const n = activePie.options.length;
   const sliceAngle = 360 / n;
-  const idx = Math.floor(angle / sliceAngle);
+  let adjusted = angle - activePie.offset;
+  adjusted = ((adjusted % 360) + 360) % 360;
+  const idx = Math.floor(adjusted / sliceAngle);
 
   if (idx !== activePie.highlighted) {
     // Vibrate
