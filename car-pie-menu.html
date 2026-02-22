@@ -62,9 +62,14 @@ html,body{
   gap:4px;overflow:hidden;
   cursor:pointer;
 }
-.region-icon{font-size:2.2em;opacity:0.5;pointer-events:none}
-.region-label{font-size:1em;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;opacity:0.5;pointer-events:none}
-.region-state{font-size:0.85em;opacity:0.4;margin-top:2px;pointer-events:none;min-height:1.1em}
+.region-icon{font-size:3em;opacity:0.5;pointer-events:none}
+.region-label{font-size:1.4em;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;opacity:0.5;pointer-events:none}
+.region-state{font-size:1.1em;opacity:0.4;margin-top:2px;pointer-events:none;min-height:1.1em}
+.hint{
+  position:absolute;font-size:1.4em;opacity:0.35;
+  pointer-events:none;text-align:center;white-space:nowrap;
+  transform:translate(-50%,-50%);font-weight:500;
+}
 
 .region[data-region="climate"]{background:color-mix(in srgb,var(--climate) 8%,var(--bg))}
 .region[data-region="drive"]{background:color-mix(in srgb,var(--drive) 8%,var(--bg))}
@@ -467,6 +472,32 @@ function showToast(msg) {
   toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1500);
 }
 
+// ── Directional hints ─────────────────────────────────
+function renderHints() {
+  document.querySelectorAll('.hint').forEach(el => el.remove());
+  for (const [name, reg] of Object.entries(regions)) {
+    const cell = document.querySelector(`.region[data-region="${name}"]`);
+    if (!cell) continue;
+    const w = cell.offsetWidth, h = cell.offsetHeight;
+    const opts = reg.options, n = opts.length;
+    const sliceAngle = 360 / n;
+    const offset = reg.offset !== undefined ? reg.offset : -sliceAngle / 2;
+    const rx = w * 0.35, ry = h * 0.35;
+    for (let i = 0; i < n; i++) {
+      const midAngle = i * sliceAngle + offset + sliceAngle / 2;
+      const a = (midAngle - 90) * Math.PI / 180;
+      const hint = document.createElement('div');
+      hint.className = 'hint';
+      hint.style.left = (w / 2 + rx * Math.cos(a)) + 'px';
+      hint.style.top = (h / 2 + ry * Math.sin(a)) + 'px';
+      hint.style.color = reg.color;
+      hint.textContent = `${opts[i].icon} ${opts[i].label}`;
+      cell.appendChild(hint);
+    }
+  }
+}
+window.addEventListener('resize', renderHints);
+
 // ── Event handling ─────────────────────────────────────
 function getRegionFromElement(el) {
   const region = el.closest('.region');
@@ -523,6 +554,7 @@ document.addEventListener('mouseup', e => {
 
 // ── Init ───────────────────────────────────────────────
 updateStateDisplays();
+renderHints();
 </script>
 </body>
 </html>
