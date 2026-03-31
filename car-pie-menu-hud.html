@@ -6,35 +6,61 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Car Pie Menu</title>
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Car%20Pie%20Menu%22%2C%22short_name%22%3A%22CarPie%22%2C%22display%22%3A%22fullscreen%22%2C%22orientation%22%3A%22landscape%22%2C%22background_color%22%3A%22%23101820%22%2C%22theme_color%22%3A%22%23101820%22%7D">
+<title>Car Pie Menu — HUD</title>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Car%20Pie%20Menu%20HUD%22%2C%22short_name%22%3A%22CarHUD%22%2C%22display%22%3A%22fullscreen%22%2C%22orientation%22%3A%22landscape%22%2C%22background_color%22%3A%22%23080810%22%2C%22theme_color%22%3A%22%23080810%22%7D">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0c0c10;
-  --surface:rgba(255,255,255,0.04);
-  --grid-border:rgba(255,255,255,0.06);
-  --toast-bg:rgba(255,255,255,0.14);
+  --bg:#080810;
+  --surface:rgba(255,255,255,0.02);
+  --grid-border:rgba(255,255,255,0.04);
+  --toast-bg:rgba(255,255,255,0.10);
   --climate:#4fc3f7;
   --drive:#ffb74d;
   --media:#ce93d8;
   --vehicle:#90a4ae;
+  --climate-bright:#7fd8ff;
+  --drive-bright:#ffd08a;
+  --media-bright:#e0b0ea;
+  --vehicle-bright:#b0c4cc;
 }
 html,body{
   width:100%;height:100%;overflow:hidden;
   background:var(--bg);color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif;
+  font-family:'SF Mono','Fira Code','Cascadia Code','JetBrains Mono',monospace;
   touch-action:none;user-select:none;-webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
+
+/* Scanline overlay */
+body::after{
+  content:'';
+  position:fixed;inset:0;z-index:900;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(255,255,255,0.012) 3px,
+      rgba(255,255,255,0.012) 4px
+    );
+  mix-blend-mode:overlay;
+}
+
 #fullscreen-overlay{
   position:fixed;inset:0;z-index:1000;
-  background:rgba(0,0,0,0.9);
+  background:rgba(0,0,0,0.95);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   cursor:pointer;gap:8px;
 }
-#fullscreen-overlay h1{font-size:2.2em;margin-bottom:0.1em;font-weight:300;letter-spacing:0.08em}
-#fullscreen-overlay p{font-size:1em;opacity:0.5;font-weight:400}
+#fullscreen-overlay h1{
+  font-size:2.2em;margin-bottom:0.1em;font-weight:300;letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.8);
+  text-shadow:0 0 20px rgba(79,195,247,0.3);
+}
+#fullscreen-overlay p{font-size:0.85em;opacity:0.4;font-weight:400;letter-spacing:0.15em;text-transform:uppercase}
 #fullscreen-overlay.hidden{display:none}
 
 #landscape-warning{
@@ -63,40 +89,98 @@ html,body{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:6px;overflow:hidden;
   cursor:pointer;
-  transition:background 0.2s;
+  background:var(--bg);
+  transition:background 0.3s, box-shadow 0.3s;
 }
-.region:active{background:rgba(255,255,255,0.06)!important}
-.region-icon{font-size:2.8em;opacity:0.7;pointer-events:none;filter:grayscale(0.2)}
-.region-label{font-size:1.1em;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;opacity:0.85;pointer-events:none}
-.region-state{font-size:0.9em;opacity:0.55;margin-top:2px;pointer-events:none;min-height:1.1em;font-weight:400;letter-spacing:0.02em}
-.hint{
-  position:absolute;font-size:1.2em;opacity:0.35;
-  pointer-events:none;text-align:center;white-space:nowrap;
-  transform:translate(-50%,-50%);font-weight:400;
+.region:active{background:rgba(255,255,255,0.03)!important}
+
+/* Region icons: bright white, high contrast */
+.region-icon{font-size:2.8em;opacity:0.9;pointer-events:none;filter:grayscale(0.1) brightness(1.1)}
+.region-label{
+  font-size:0.95em;font-weight:600;letter-spacing:0.25em;text-transform:uppercase;
+  opacity:0.95;pointer-events:none;
+  color:#fff;
+}
+.region-state{
+  font-size:0.75em;opacity:0.45;margin-top:2px;pointer-events:none;min-height:1.1em;
+  font-weight:400;letter-spacing:0.08em;
+  color:rgba(255,255,255,0.6);
 }
 
-.region[data-region="climate"]{background:color-mix(in srgb,var(--climate) 12%,var(--bg))}
-.region[data-region="drive"]{background:color-mix(in srgb,var(--drive) 12%,var(--bg))}
-.region[data-region="media"]{background:color-mix(in srgb,var(--media) 12%,var(--bg))}
-.region[data-region="vehicle"]{background:color-mix(in srgb,var(--vehicle) 10%,var(--bg))}
+.hint{
+  position:absolute;font-size:1em;opacity:0.30;
+  pointer-events:none;text-align:center;white-space:nowrap;
+  transform:translate(-50%,-50%);font-weight:500;
+  letter-spacing:0.04em;
+}
+
+/* HUD accent borders — colored glow on edges, NO background tint */
+.region[data-region="climate"]{
+  box-shadow:
+    inset 0 0 40px -18px var(--climate),
+    inset 0 2px 0 0 color-mix(in srgb, var(--climate) 50%, transparent),
+    inset 2px 0 0 0 color-mix(in srgb, var(--climate) 30%, transparent);
+}
+.region[data-region="drive"]{
+  box-shadow:
+    inset 0 0 40px -18px var(--drive),
+    inset 0 2px 0 0 color-mix(in srgb, var(--drive) 50%, transparent),
+    inset -2px 0 0 0 color-mix(in srgb, var(--drive) 30%, transparent);
+}
+.region[data-region="media"]{
+  box-shadow:
+    inset 0 0 40px -18px var(--media),
+    inset 0 -2px 0 0 color-mix(in srgb, var(--media) 50%, transparent),
+    inset 2px 0 0 0 color-mix(in srgb, var(--media) 30%, transparent);
+}
+.region[data-region="vehicle"]{
+  box-shadow:
+    inset 0 0 40px -18px var(--vehicle),
+    inset 0 -2px 0 0 color-mix(in srgb, var(--vehicle) 50%, transparent),
+    inset -2px 0 0 0 color-mix(in srgb, var(--vehicle) 30%, transparent);
+}
+
+/* Grid dot pattern inside each region */
+.region::before{
+  content:'';
+  position:absolute;inset:0;
+  pointer-events:none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size:20px 20px;
+  opacity:0.8;
+}
+
+/* Corner brackets — HUD targeting feel */
+.region::after{
+  content:'';
+  position:absolute;
+  inset:8px;
+  pointer-events:none;
+  border:1px solid rgba(255,255,255,0.04);
+  border-radius:2px;
+}
 
 /* Pie menu */
 #pie-overlay{
   position:fixed;inset:0;z-index:100;display:none;
-  background:rgba(0,0,0,0.4);
+  background:rgba(0,0,0,0.65);
 }
 #pie-overlay.active{display:block}
 #pie-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
 
-/* Toast */
+/* Toast — HUD style */
 #toast{
   position:fixed;bottom:40px;left:50%;transform:translateX(-50%);
-  background:rgba(255,255,255,0.12);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.08);
-  color:#fff;padding:10px 28px;border-radius:24px;
-  font-size:0.9em;font-weight:500;letter-spacing:0.03em;
+  background:rgba(8,8,16,0.85);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#fff;padding:10px 28px;border-radius:2px;
+  font-size:0.85em;font-weight:500;letter-spacing:0.1em;
   opacity:0;transition:opacity 0.25s;
   z-index:200;pointer-events:none;white-space:nowrap;
+  text-transform:uppercase;
+  box-shadow:0 0 15px rgba(79,195,247,0.08);
 }
 #toast.show{opacity:1}
 
@@ -111,7 +195,7 @@ html,body{
 
 <div id="fullscreen-overlay">
   <h1>Car Pie Menu</h1>
-  <p>Tap to enter fullscreen</p>
+  <p>Tap to initialize HUD</p>
 </div>
 
 <div id="landscape-warning">
@@ -161,57 +245,56 @@ const state = {
 
 // ── Region definitions ─────────────────────────────────
 const regions = {
-  // Default offset = -(360/n)/2, centers sector 0 at top (0°)
-  // 8 items → sectors at compass directions: ↑ ↗ → ↘ ↓ ↙ ← ↖
   climate: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--climate').trim(),
+    brightColor: getComputedStyle(document.documentElement).getPropertyValue('--climate-bright').trim(),
     options: [
-      { label: 'Temp +', icon: '🔺' },   // ↑
-      { label: 'Fan +', icon: '💨' },     // ↗
-      { label: 'AC', icon: '❄' },         // →
-      { label: 'Defrost F', icon: '▓' },  // ↘
-      { label: 'Temp −', icon: '🔻' },    // ↓
-      { label: 'Fan −', icon: '🌬' },     // ↙
-      { label: 'Auto', icon: 'Ⓐ' },      // ←
-      { label: 'Defrost R', icon: '▒' },  // ↖
+      { label: 'Temp +', icon: '🔺' },
+      { label: 'Fan +', icon: '💨' },
+      { label: 'AC', icon: '❄' },
+      { label: 'Defrost F', icon: '▓' },
+      { label: 'Temp −', icon: '🔻' },
+      { label: 'Fan −', icon: '🌬' },
+      { label: 'Auto', icon: 'Ⓐ' },
+      { label: 'Defrost R', icon: '▒' },
     ],
   },
   drive: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--drive').trim(),
-    // Driving + Doors merged — 8 items at compass directions
+    brightColor: getComputedStyle(document.documentElement).getPropertyValue('--drive-bright').trim(),
     options: [
-      { label: 'Headlights', icon: '💡' }, // ↑
-      { label: 'High beam', icon: '🔆' },  // ↗
-      { label: 'Right', icon: '▶' },       // →
-      { label: 'Hazards', icon: '⚠' },     // ↘
-      { label: 'Wipers', icon: '🌧' },     // ↓
-      { label: 'Trunk', icon: '📦' },      // ↙
-      { label: 'Left', icon: '◀' },        // ←
-      { label: 'Lock', icon: '🔒' },       // ↖
+      { label: 'Headlights', icon: '💡' },
+      { label: 'High beam', icon: '🔆' },
+      { label: 'Right', icon: '▶' },
+      { label: 'Hazards', icon: '⚠' },
+      { label: 'Wipers', icon: '🌧' },
+      { label: 'Trunk', icon: '📦' },
+      { label: 'Left', icon: '◀' },
+      { label: 'Lock', icon: '🔒' },
     ],
   },
   media: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--media').trim(),
-    // Music + Navigation merged — 8 items at compass directions
+    brightColor: getComputedStyle(document.documentElement).getPropertyValue('--media-bright').trim(),
     options: [
-      { label: 'Vol +', icon: '🔊' },      // ↑
-      { label: 'Next', icon: '⏭' },        // ↗
-      { label: 'Source', icon: '📡' },      // →
-      { label: 'Nav audio', icon: '🔈' },  // ↘
-      { label: 'Vol −', icon: '🔉' },       // ↓
-      { label: 'Prev', icon: '⏮' },        // ↙
-      { label: 'Recenter', icon: '◎' },    // ←
-      { label: 'Play/Pause', icon: '⏯' },  // ↖
+      { label: 'Vol +', icon: '🔊' },
+      { label: 'Next', icon: '⏭' },
+      { label: 'Source', icon: '📡' },
+      { label: 'Nav audio', icon: '🔈' },
+      { label: 'Vol −', icon: '🔉' },
+      { label: 'Prev', icon: '⏮' },
+      { label: 'Recenter', icon: '◎' },
+      { label: 'Play/Pause', icon: '⏯' },
     ],
   },
   vehicle: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--vehicle').trim(),
-    // 4 items → sectors at ↑ → ↓ ←
+    brightColor: getComputedStyle(document.documentElement).getPropertyValue('--vehicle-bright').trim(),
     options: [
-      { label: 'Seat heat', icon: '🔥' },  // ↑
-      { label: 'Camera', icon: '📷' },     // →
-      { label: 'Settings', icon: '⚙' },   // ↓
-      { label: 'Mirrors', icon: '🪞' },    // ←
+      { label: 'Seat heat', icon: '🔥' },
+      { label: 'Camera', icon: '📷' },
+      { label: 'Settings', icon: '⚙' },
+      { label: 'Mirrors', icon: '🪞' },
     ],
   },
 };
@@ -272,6 +355,15 @@ function createSVGElement(tag, attrs) {
   return el;
 }
 
+// ── Hex to rgba helper ─────────────────────────────────
+function hexToRgba(hex, alpha) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 // ── Show pie ───────────────────────────────────────────
 function showPie(regionName, cx, cy) {
   const reg = regions[regionName];
@@ -282,9 +374,23 @@ function showPie(regionName, cx, cy) {
 
   const offset = reg.offset !== undefined ? reg.offset : -sliceAngle / 2;
 
-  activePie = { region: regionName, cx, cy, options: opts, color: reg.color, highlighted: -1, offset };
+  activePie = { region: regionName, cx, cy, options: opts, color: reg.color, brightColor: reg.brightColor, highlighted: -1, offset };
 
   svg.innerHTML = '';
+
+  // SVG defs for glow filter
+  const defs = createSVGElement('defs', {});
+  const filter = createSVGElement('filter', { id: 'glow', x: '-50%', y: '-50%', width: '200%', height: '200%' });
+  const feGaussian = createSVGElement('feGaussianBlur', { stdDeviation: '3', result: 'coloredBlur' });
+  const feMerge = createSVGElement('feMerge', {});
+  const feMergeNode1 = createSVGElement('feMergeNode', { in: 'coloredBlur' });
+  const feMergeNode2 = createSVGElement('feMergeNode', { in: 'SourceGraphic' });
+  feMerge.appendChild(feMergeNode1);
+  feMerge.appendChild(feMergeNode2);
+  filter.appendChild(feGaussian);
+  filter.appendChild(feMerge);
+  defs.appendChild(filter);
+  svg.appendChild(defs);
 
   const g = createSVGElement('g', {
     style: `transform-origin:${cx}px ${cy}px;animation:pie-in 0.12s ease-out`,
@@ -295,12 +401,13 @@ function showPie(regionName, cx, cy) {
     const endA = startA + sliceAngle;
     const d = sectorPath(cx, cy, INNER_R, OUTER_R, startA, endA);
 
+    // Outlined sector: nearly invisible fill, bright colored stroke
     const path = createSVGElement('path', {
       d,
-      fill: reg.color,
-      'fill-opacity': '0.25',
-      stroke: 'rgba(255,255,255,0.15)',
-      'stroke-width': '0.5',
+      fill: hexToRgba(reg.color, 0.03),
+      stroke: reg.color,
+      'stroke-width': '1.5',
+      'stroke-opacity': '0.6',
       'data-index': i,
       class: 'pie-sector',
     });
@@ -325,22 +432,35 @@ function showPie(regionName, cx, cy) {
       x: lp.x, y: lp.y + 13,
       'text-anchor': 'middle',
       'dominant-baseline': 'central',
-      'font-size': '10',
-      'font-weight': '500',
-      'letter-spacing': '0.05em',
+      'font-size': '9',
+      'font-weight': '600',
+      'letter-spacing': '0.1em',
       fill: '#fff',
+      'font-family': "'SF Mono','Fira Code','Cascadia Code',monospace",
       'pointer-events': 'none',
-      opacity: '0.85',
+      opacity: '0.9',
     });
-    text.textContent = opts[i].label;
+    text.textContent = opts[i].label.toUpperCase();
     g.appendChild(text);
   }
 
+  // Center circle — dark with colored ring
+  const centerRing = createSVGElement('circle', {
+    cx, cy, r: INNER_R - 4,
+    fill: 'none',
+    stroke: reg.color,
+    'stroke-width': '1',
+    'stroke-opacity': '0.4',
+    filter: 'url(#glow)',
+  });
+  g.appendChild(centerRing);
+
   const center = createSVGElement('circle', {
     cx, cy, r: INNER_R - 6,
-    fill: 'rgba(12,12,16,0.8)',
-    stroke: 'rgba(255,255,255,0.1)',
+    fill: 'rgba(8,8,16,0.9)',
+    stroke: reg.color,
     'stroke-width': '0.5',
+    'stroke-opacity': '0.2',
   });
   g.appendChild(center);
 
@@ -348,10 +468,12 @@ function showPie(regionName, cx, cy) {
     x: cx, y: cy,
     'text-anchor': 'middle',
     'dominant-baseline': 'central',
-    'font-size': '10',
+    'font-size': '9',
     'font-weight': '400',
-    'letter-spacing': '0.05em',
-    fill: 'rgba(255,255,255,0.5)',
+    'letter-spacing': '0.15em',
+    'font-family': "'SF Mono','Fira Code','Cascadia Code',monospace",
+    fill: reg.color,
+    'fill-opacity': '0.6',
     id: 'pie-center-label',
     'pointer-events': 'none',
   });
@@ -371,12 +493,24 @@ function updateHighlight(px, py) {
 
   const sectors = svg.querySelectorAll('.pie-sector');
   const centerLabel = document.getElementById('pie-center-label');
+  const color = activePie.color;
+  const brightColor = activePie.brightColor;
 
   if (dist < DEAD_ZONE) {
     if (activePie.highlighted !== -1) {
-      sectors.forEach(s => { s.setAttribute('fill-opacity', '0.25'); });
+      sectors.forEach(s => {
+        s.setAttribute('fill', hexToRgba(color, 0.03));
+        s.setAttribute('stroke', color);
+        s.setAttribute('stroke-opacity', '0.6');
+        s.setAttribute('stroke-width', '1.5');
+        s.removeAttribute('filter');
+      });
       activePie.highlighted = -1;
-      if (centerLabel) centerLabel.textContent = '✕';
+      if (centerLabel) {
+        centerLabel.textContent = '✕';
+        centerLabel.setAttribute('fill', color);
+        centerLabel.setAttribute('fill-opacity', '0.6');
+      }
     }
     return;
   }
@@ -393,10 +527,26 @@ function updateHighlight(px, py) {
   if (idx !== activePie.highlighted) {
     if (navigator.vibrate) navigator.vibrate(8);
     sectors.forEach((s, i) => {
-      s.setAttribute('fill-opacity', i === idx ? '0.6' : '0.15');
+      if (i === idx) {
+        s.setAttribute('fill', hexToRgba(brightColor, 0.15));
+        s.setAttribute('stroke', brightColor);
+        s.setAttribute('stroke-opacity', '1');
+        s.setAttribute('stroke-width', '2');
+        s.setAttribute('filter', 'url(#glow)');
+      } else {
+        s.setAttribute('fill', hexToRgba(color, 0.02));
+        s.setAttribute('stroke', color);
+        s.setAttribute('stroke-opacity', '0.25');
+        s.setAttribute('stroke-width', '1');
+        s.removeAttribute('filter');
+      }
     });
     activePie.highlighted = idx;
-    if (centerLabel) centerLabel.textContent = activePie.options[idx].label;
+    if (centerLabel) {
+      centerLabel.textContent = activePie.options[idx].label.toUpperCase();
+      centerLabel.setAttribute('fill', brightColor);
+      centerLabel.setAttribute('fill-opacity', '1');
+    }
   }
 }
 
@@ -447,7 +597,7 @@ function handleAction(region, action) {
       if (action === 'Vol +') s.vol = Math.min(100, s.vol + 5);
       else if (action === 'Vol −') s.vol = Math.max(0, s.vol - 5);
       else if (action === 'Play/Pause') s.playing = !s.playing;
-      else if (action === 'Next' || action === 'Prev') {} // no state change for demo
+      else if (action === 'Next' || action === 'Prev') {}
       else if (action === 'Source') {
         const sources = ['Bluetooth', 'Radio', 'USB', 'AUX'];
         s.source = sources[(sources.indexOf(s.source) + 1) % sources.length];
@@ -499,7 +649,8 @@ function renderHints() {
       hint.className = 'hint';
       hint.style.left = (w / 2 + rx * Math.cos(a)) + 'px';
       hint.style.top = (h / 2 + ry * Math.sin(a)) + 'px';
-      hint.style.color = reg.color;
+      // Use brighter accent color for hints
+      hint.style.color = reg.brightColor;
       hint.textContent = `${opts[i].icon} ${opts[i].label}`;
       cell.appendChild(hint);
     }

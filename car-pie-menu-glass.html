@@ -6,84 +6,148 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Car Pie Menu</title>
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Car%20Pie%20Menu%22%2C%22short_name%22%3A%22CarPie%22%2C%22display%22%3A%22fullscreen%22%2C%22orientation%22%3A%22landscape%22%2C%22background_color%22%3A%22%23101820%22%2C%22theme_color%22%3A%22%23101820%22%7D">
+<title>Car Pie Menu — Glass</title>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Car%20Pie%20Glass%22%2C%22short_name%22%3A%22CarGlass%22%2C%22display%22%3A%22fullscreen%22%2C%22orientation%22%3A%22landscape%22%2C%22background_color%22%3A%22%230a0e1a%22%2C%22theme_color%22%3A%22%230a0e1a%22%7D">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0c0c10;
-  --surface:rgba(255,255,255,0.04);
-  --grid-border:rgba(255,255,255,0.06);
-  --toast-bg:rgba(255,255,255,0.14);
-  --climate:#4fc3f7;
-  --drive:#ffb74d;
-  --media:#ce93d8;
-  --vehicle:#90a4ae;
+  --bg-from:#0a0e1a;
+  --bg-via:#121630;
+  --bg-to:#1a0e2e;
+  --glass:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.12);
+  --glass-blur:20px;
+  --gap:14px;
+  --radius:20px;
+  --toast-bg:rgba(255,255,255,0.1);
+  --climate:#5ad8ff;
+  --drive:#ffca6a;
+  --media:#d9a0f7;
+  --vehicle:#a8c0cc;
 }
 html,body{
   width:100%;height:100%;overflow:hidden;
-  background:var(--bg);color:#fff;
+  background:linear-gradient(135deg, var(--bg-from) 0%, var(--bg-via) 50%, var(--bg-to) 100%);
+  color:#fff;
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif;
   touch-action:none;user-select:none;-webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
+
+/* Ambient background orbs for depth */
+body::before,body::after{
+  content:'';position:fixed;border-radius:50%;pointer-events:none;
+  filter:blur(100px);opacity:0.18;z-index:0;
+}
+body::before{
+  width:500px;height:500px;
+  top:-120px;left:-80px;
+  background:radial-gradient(circle,#3a7bd5,transparent 70%);
+}
+body::after{
+  width:600px;height:600px;
+  bottom:-150px;right:-100px;
+  background:radial-gradient(circle,#6c3baa,transparent 70%);
+}
+
 #fullscreen-overlay{
   position:fixed;inset:0;z-index:1000;
-  background:rgba(0,0,0,0.9);
+  background:rgba(6,8,18,0.92);
+  backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  cursor:pointer;gap:8px;
+  cursor:pointer;gap:10px;
 }
-#fullscreen-overlay h1{font-size:2.2em;margin-bottom:0.1em;font-weight:300;letter-spacing:0.08em}
-#fullscreen-overlay p{font-size:1em;opacity:0.5;font-weight:400}
+#fullscreen-overlay h1{
+  font-size:2.4em;margin-bottom:0.1em;font-weight:200;letter-spacing:0.12em;
+  background:linear-gradient(135deg,#fff 30%,rgba(180,200,255,0.7));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+#fullscreen-overlay p{font-size:1em;opacity:0.45;font-weight:400;letter-spacing:0.04em}
 #fullscreen-overlay.hidden{display:none}
 
 #landscape-warning{
   position:fixed;inset:0;z-index:999;
-  background:var(--bg);
+  background:linear-gradient(135deg, var(--bg-from), var(--bg-to));
   display:none;align-items:center;justify-content:center;
   flex-direction:column;gap:1em;
 }
 #landscape-warning svg{width:60px;height:60px;fill:#fff;opacity:0.5}
-#landscape-warning p{opacity:0.6;font-size:1.1em}
+#landscape-warning p{opacity:0.55;font-size:1.1em;letter-spacing:0.03em}
 @media(orientation:portrait){
   #landscape-warning{display:flex}
   #grid{display:none!important}
 }
 
 #grid{
+  position:relative;z-index:1;
   width:100%;height:100%;
   display:grid;
   grid-template-columns:1fr 1fr;
   grid-template-rows:1fr 1fr;
-  gap:1px;
-  background:var(--grid-border);
+  gap:var(--gap);
+  padding:var(--gap);
 }
 .region{
   position:relative;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;overflow:hidden;
+  gap:8px;overflow:hidden;
   cursor:pointer;
-  transition:background 0.2s;
+  border-radius:var(--radius);
+  background:var(--glass);
+  backdrop-filter:blur(var(--glass-blur));
+  -webkit-backdrop-filter:blur(var(--glass-blur));
+  border:1px solid var(--glass-border);
+  transition:background 0.25s, border-color 0.25s, box-shadow 0.25s;
 }
-.region:active{background:rgba(255,255,255,0.06)!important}
-.region-icon{font-size:2.8em;opacity:0.7;pointer-events:none;filter:grayscale(0.2)}
-.region-label{font-size:1.1em;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;opacity:0.85;pointer-events:none}
-.region-state{font-size:0.9em;opacity:0.55;margin-top:2px;pointer-events:none;min-height:1.1em;font-weight:400;letter-spacing:0.02em}
+.region:active{
+  background:rgba(255,255,255,0.1)!important;
+  border-color:rgba(255,255,255,0.2)!important;
+}
+.region::before{
+  content:'';position:absolute;inset:0;border-radius:var(--radius);
+  background:linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 40%);
+  pointer-events:none;
+}
+.region-icon{font-size:2.8em;opacity:0.85;pointer-events:none;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3))}
+.region-label{
+  font-size:1.15em;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;
+  opacity:0.92;pointer-events:none;
+  text-shadow:0 1px 4px rgba(0,0,0,0.3);
+}
+.region-state{
+  font-size:0.88em;opacity:0.55;margin-top:2px;pointer-events:none;
+  min-height:1.1em;font-weight:400;letter-spacing:0.03em;
+}
 .hint{
-  position:absolute;font-size:1.2em;opacity:0.35;
+  position:absolute;font-size:1.2em;opacity:0.3;
   pointer-events:none;text-align:center;white-space:nowrap;
   transform:translate(-50%,-50%);font-weight:400;
 }
 
-.region[data-region="climate"]{background:color-mix(in srgb,var(--climate) 12%,var(--bg))}
-.region[data-region="drive"]{background:color-mix(in srgb,var(--drive) 12%,var(--bg))}
-.region[data-region="media"]{background:color-mix(in srgb,var(--media) 12%,var(--bg))}
-.region[data-region="vehicle"]{background:color-mix(in srgb,var(--vehicle) 10%,var(--bg))}
+/* Region accent glows */
+.region[data-region="climate"]{
+  box-shadow:inset 0 0 40px rgba(90,216,255,0.06), 0 0 30px rgba(90,216,255,0.04);
+  border-color:rgba(90,216,255,0.15);
+}
+.region[data-region="drive"]{
+  box-shadow:inset 0 0 40px rgba(255,202,106,0.06), 0 0 30px rgba(255,202,106,0.04);
+  border-color:rgba(255,202,106,0.15);
+}
+.region[data-region="media"]{
+  box-shadow:inset 0 0 40px rgba(217,160,247,0.06), 0 0 30px rgba(217,160,247,0.04);
+  border-color:rgba(217,160,247,0.15);
+}
+.region[data-region="vehicle"]{
+  box-shadow:inset 0 0 40px rgba(168,192,204,0.05), 0 0 30px rgba(168,192,204,0.03);
+  border-color:rgba(168,192,204,0.13);
+}
 
 /* Pie menu */
 #pie-overlay{
   position:fixed;inset:0;z-index:100;display:none;
-  background:rgba(0,0,0,0.4);
+  background:rgba(6,8,18,0.5);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
 }
 #pie-overlay.active{display:block}
 #pie-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
@@ -91,14 +155,21 @@ html,body{
 /* Toast */
 #toast{
   position:fixed;bottom:40px;left:50%;transform:translateX(-50%);
-  background:rgba(255,255,255,0.12);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.08);
-  color:#fff;padding:10px 28px;border-radius:24px;
-  font-size:0.9em;font-weight:500;letter-spacing:0.03em;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.1);
+  color:#fff;padding:12px 32px;border-radius:28px;
+  font-size:0.92em;font-weight:500;letter-spacing:0.04em;
   opacity:0;transition:opacity 0.25s;
   z-index:200;pointer-events:none;white-space:nowrap;
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
 }
 #toast.show{opacity:1}
+
+/* SVG filter for frosted glass sectors */
+.pie-sector-glass{
+  filter:url(#glass-blur);
+}
 
 /* Pie enter animation */
 @keyframes pie-in{
@@ -161,57 +232,52 @@ const state = {
 
 // ── Region definitions ─────────────────────────────────
 const regions = {
-  // Default offset = -(360/n)/2, centers sector 0 at top (0°)
-  // 8 items → sectors at compass directions: ↑ ↗ → ↘ ↓ ↙ ← ↖
   climate: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--climate').trim(),
     options: [
-      { label: 'Temp +', icon: '🔺' },   // ↑
-      { label: 'Fan +', icon: '💨' },     // ↗
-      { label: 'AC', icon: '❄' },         // →
-      { label: 'Defrost F', icon: '▓' },  // ↘
-      { label: 'Temp −', icon: '🔻' },    // ↓
-      { label: 'Fan −', icon: '🌬' },     // ↙
-      { label: 'Auto', icon: 'Ⓐ' },      // ←
-      { label: 'Defrost R', icon: '▒' },  // ↖
+      { label: 'Temp +', icon: '🔺' },
+      { label: 'Fan +', icon: '💨' },
+      { label: 'AC', icon: '❄' },
+      { label: 'Defrost F', icon: '▓' },
+      { label: 'Temp −', icon: '🔻' },
+      { label: 'Fan −', icon: '🌬' },
+      { label: 'Auto', icon: 'Ⓐ' },
+      { label: 'Defrost R', icon: '▒' },
     ],
   },
   drive: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--drive').trim(),
-    // Driving + Doors merged — 8 items at compass directions
     options: [
-      { label: 'Headlights', icon: '💡' }, // ↑
-      { label: 'High beam', icon: '🔆' },  // ↗
-      { label: 'Right', icon: '▶' },       // →
-      { label: 'Hazards', icon: '⚠' },     // ↘
-      { label: 'Wipers', icon: '🌧' },     // ↓
-      { label: 'Trunk', icon: '📦' },      // ↙
-      { label: 'Left', icon: '◀' },        // ←
-      { label: 'Lock', icon: '🔒' },       // ↖
+      { label: 'Headlights', icon: '💡' },
+      { label: 'High beam', icon: '🔆' },
+      { label: 'Right', icon: '▶' },
+      { label: 'Hazards', icon: '⚠' },
+      { label: 'Wipers', icon: '🌧' },
+      { label: 'Trunk', icon: '📦' },
+      { label: 'Left', icon: '◀' },
+      { label: 'Lock', icon: '🔒' },
     ],
   },
   media: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--media').trim(),
-    // Music + Navigation merged — 8 items at compass directions
     options: [
-      { label: 'Vol +', icon: '🔊' },      // ↑
-      { label: 'Next', icon: '⏭' },        // ↗
-      { label: 'Source', icon: '📡' },      // →
-      { label: 'Nav audio', icon: '🔈' },  // ↘
-      { label: 'Vol −', icon: '🔉' },       // ↓
-      { label: 'Prev', icon: '⏮' },        // ↙
-      { label: 'Recenter', icon: '◎' },    // ←
-      { label: 'Play/Pause', icon: '⏯' },  // ↖
+      { label: 'Vol +', icon: '🔊' },
+      { label: 'Next', icon: '⏭' },
+      { label: 'Source', icon: '📡' },
+      { label: 'Nav audio', icon: '🔈' },
+      { label: 'Vol −', icon: '🔉' },
+      { label: 'Prev', icon: '⏮' },
+      { label: 'Recenter', icon: '◎' },
+      { label: 'Play/Pause', icon: '⏯' },
     ],
   },
   vehicle: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--vehicle').trim(),
-    // 4 items → sectors at ↑ → ↓ ←
     options: [
-      { label: 'Seat heat', icon: '🔥' },  // ↑
-      { label: 'Camera', icon: '📷' },     // →
-      { label: 'Settings', icon: '⚙' },   // ↓
-      { label: 'Mirrors', icon: '🪞' },    // ←
+      { label: 'Seat heat', icon: '🔥' },
+      { label: 'Camera', icon: '📷' },
+      { label: 'Settings', icon: '⚙' },
+      { label: 'Mirrors', icon: '🪞' },
     ],
   },
 };
@@ -244,6 +310,16 @@ fsOverlay.addEventListener('click', () => {
 fsOverlay.addEventListener('touchstart', () => {
   fsOverlay.classList.add('hidden');
 }, { once: true });
+
+// ── Color helpers ─────────────────────────────────────
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  return { r, g, b };
+}
 
 // ── SVG helpers ────────────────────────────────────────
 function polarToCartesian(cx, cy, r, angleDeg) {
@@ -286,25 +362,75 @@ function showPie(regionName, cx, cy) {
 
   svg.innerHTML = '';
 
+  // Add SVG defs for the frosted glass effect
+  const defs = createSVGElement('defs', {});
+
+  // Gaussian blur filter for the glass
+  const filter = createSVGElement('filter', { id: 'sector-glow', x: '-50%', y: '-50%', width: '200%', height: '200%' });
+  const feGaussian = createSVGElement('feGaussianBlur', { in: 'SourceAlpha', stdDeviation: '4', result: 'blur' });
+  const feFlood = createSVGElement('feFlood', { 'flood-color': reg.color, 'flood-opacity': '0.3', result: 'color' });
+  const feComposite = createSVGElement('feComposite', { in: 'color', in2: 'blur', operator: 'in', result: 'glow' });
+  const feMerge = createSVGElement('feMerge', {});
+  const feMergeGlow = createSVGElement('feMergeNode', { in: 'glow' });
+  const feMergeSrc = createSVGElement('feMergeNode', { in: 'SourceGraphic' });
+  feMerge.appendChild(feMergeGlow);
+  feMerge.appendChild(feMergeSrc);
+  filter.appendChild(feGaussian);
+  filter.appendChild(feFlood);
+  filter.appendChild(feComposite);
+  filter.appendChild(feMerge);
+  defs.appendChild(filter);
+
+  svg.appendChild(defs);
+
   const g = createSVGElement('g', {
-    style: `transform-origin:${cx}px ${cy}px;animation:pie-in 0.12s ease-out`,
+    style: `transform-origin:${cx}px ${cy}px;animation:pie-in 0.15s cubic-bezier(0.2,0.9,0.3,1)`,
   });
+
+  const rgb = hexToRgb(reg.color);
+
+  // Outer glow ring
+  const glowRing = createSVGElement('circle', {
+    cx, cy, r: OUTER_R + 2,
+    fill: 'none',
+    stroke: reg.color,
+    'stroke-opacity': '0.08',
+    'stroke-width': '4',
+  });
+  g.appendChild(glowRing);
 
   for (let i = 0; i < n; i++) {
     const startA = i * sliceAngle + offset;
     const endA = startA + sliceAngle;
     const d = sectorPath(cx, cy, INNER_R, OUTER_R, startA, endA);
 
+    // Glass background fill
+    const pathBg = createSVGElement('path', {
+      d,
+      fill: `rgba(${rgb.r},${rgb.g},${rgb.b},0.08)`,
+      'data-index': i,
+      class: 'pie-sector-bg',
+    });
+    g.appendChild(pathBg);
+
+    // Main sector (interactive)
     const path = createSVGElement('path', {
       d,
-      fill: reg.color,
-      'fill-opacity': '0.25',
-      stroke: 'rgba(255,255,255,0.15)',
-      'stroke-width': '0.5',
+      fill: `rgba(${rgb.r},${rgb.g},${rgb.b},0.18)`,
+      stroke: `rgba(${rgb.r},${rgb.g},${rgb.b},0.25)`,
+      'stroke-width': '0.8',
       'data-index': i,
       class: 'pie-sector',
     });
     g.appendChild(path);
+
+    // Inner highlight edge (top-light effect)
+    const pathHighlight = createSVGElement('path', {
+      d: sectorPath(cx, cy, INNER_R, INNER_R + 2, startA + 0.5, endA - 0.5),
+      fill: 'rgba(255,255,255,0.08)',
+      'pointer-events': 'none',
+    });
+    g.appendChild(pathHighlight);
 
     const midAngle = startA + sliceAngle / 2;
     const lp = polarToCartesian(cx, cy, LABEL_R, midAngle);
@@ -327,22 +453,47 @@ function showPie(regionName, cx, cy) {
       'dominant-baseline': 'central',
       'font-size': '10',
       'font-weight': '500',
-      'letter-spacing': '0.05em',
+      'letter-spacing': '0.06em',
       fill: '#fff',
       'pointer-events': 'none',
-      opacity: '0.85',
+      opacity: '0.9',
     });
     text.textContent = opts[i].label;
     g.appendChild(text);
   }
 
-  const center = createSVGElement('circle', {
-    cx, cy, r: INNER_R - 6,
-    fill: 'rgba(12,12,16,0.8)',
-    stroke: 'rgba(255,255,255,0.1)',
-    'stroke-width': '0.5',
+  // Divider lines between sectors
+  for (let i = 0; i < n; i++) {
+    const angle = i * sliceAngle + offset;
+    const pInner = polarToCartesian(cx, cy, INNER_R + 1, angle);
+    const pOuter = polarToCartesian(cx, cy, OUTER_R - 1, angle);
+    const line = createSVGElement('line', {
+      x1: pInner.x, y1: pInner.y,
+      x2: pOuter.x, y2: pOuter.y,
+      stroke: 'rgba(255,255,255,0.06)',
+      'stroke-width': '0.5',
+      'pointer-events': 'none',
+    });
+    g.appendChild(line);
+  }
+
+  // Center glass disc
+  const centerGlow = createSVGElement('circle', {
+    cx, cy, r: INNER_R - 4,
+    fill: 'rgba(10,14,26,0.7)',
+    stroke: `rgba(${rgb.r},${rgb.g},${rgb.b},0.2)`,
+    'stroke-width': '0.8',
   });
-  g.appendChild(center);
+  g.appendChild(centerGlow);
+
+  // Center highlight arc (top reflection)
+  const centerHL = createSVGElement('ellipse', {
+    cx, cy: cy - (INNER_R * 0.25),
+    rx: INNER_R * 0.5, ry: INNER_R * 0.15,
+    fill: 'rgba(255,255,255,0.04)',
+    'pointer-events': 'none',
+  });
+  g.appendChild(centerHL);
 
   const centerText = createSVGElement('text', {
     x: cx, y: cy,
@@ -350,7 +501,7 @@ function showPie(regionName, cx, cy) {
     'dominant-baseline': 'central',
     'font-size': '10',
     'font-weight': '400',
-    'letter-spacing': '0.05em',
+    'letter-spacing': '0.06em',
     fill: 'rgba(255,255,255,0.5)',
     id: 'pie-center-label',
     'pointer-events': 'none',
@@ -370,11 +521,20 @@ function updateHighlight(px, py) {
   const dist = Math.sqrt(dx * dx + dy * dy);
 
   const sectors = svg.querySelectorAll('.pie-sector');
+  const sectorsBg = svg.querySelectorAll('.pie-sector-bg');
   const centerLabel = document.getElementById('pie-center-label');
+
+  const rgb = hexToRgb(activePie.color);
 
   if (dist < DEAD_ZONE) {
     if (activePie.highlighted !== -1) {
-      sectors.forEach(s => { s.setAttribute('fill-opacity', '0.25'); });
+      sectors.forEach((s, i) => {
+        s.setAttribute('fill', `rgba(${rgb.r},${rgb.g},${rgb.b},0.18)`);
+        s.setAttribute('stroke', `rgba(${rgb.r},${rgb.g},${rgb.b},0.25)`);
+      });
+      sectorsBg.forEach(s => {
+        s.setAttribute('fill', `rgba(${rgb.r},${rgb.g},${rgb.b},0.08)`);
+      });
       activePie.highlighted = -1;
       if (centerLabel) centerLabel.textContent = '✕';
     }
@@ -393,7 +553,20 @@ function updateHighlight(px, py) {
   if (idx !== activePie.highlighted) {
     if (navigator.vibrate) navigator.vibrate(8);
     sectors.forEach((s, i) => {
-      s.setAttribute('fill-opacity', i === idx ? '0.6' : '0.15');
+      if (i === idx) {
+        s.setAttribute('fill', `rgba(${rgb.r},${rgb.g},${rgb.b},0.45)`);
+        s.setAttribute('stroke', `rgba(${rgb.r},${rgb.g},${rgb.b},0.5)`);
+        s.setAttribute('stroke-width', '1.2');
+      } else {
+        s.setAttribute('fill', `rgba(${rgb.r},${rgb.g},${rgb.b},0.08)`);
+        s.setAttribute('stroke', `rgba(${rgb.r},${rgb.g},${rgb.b},0.15)`);
+        s.setAttribute('stroke-width', '0.8');
+      }
+    });
+    sectorsBg.forEach((s, i) => {
+      s.setAttribute('fill', i === idx
+        ? `rgba(${rgb.r},${rgb.g},${rgb.b},0.15)`
+        : `rgba(${rgb.r},${rgb.g},${rgb.b},0.04)`);
     });
     activePie.highlighted = idx;
     if (centerLabel) centerLabel.textContent = activePie.options[idx].label;
@@ -447,7 +620,7 @@ function handleAction(region, action) {
       if (action === 'Vol +') s.vol = Math.min(100, s.vol + 5);
       else if (action === 'Vol −') s.vol = Math.max(0, s.vol - 5);
       else if (action === 'Play/Pause') s.playing = !s.playing;
-      else if (action === 'Next' || action === 'Prev') {} // no state change for demo
+      else if (action === 'Next' || action === 'Prev') {}
       else if (action === 'Source') {
         const sources = ['Bluetooth', 'Radio', 'USB', 'AUX'];
         s.source = sources[(sources.indexOf(s.source) + 1) % sources.length];
