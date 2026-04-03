@@ -6,35 +6,37 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Car Pie Menu</title>
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Car%20Pie%20Menu%22%2C%22short_name%22%3A%22CarPie%22%2C%22display%22%3A%22fullscreen%22%2C%22orientation%22%3A%22landscape%22%2C%22background_color%22%3A%22%23101820%22%2C%22theme_color%22%3A%22%23101820%22%7D">
+<title>Car Pie Menu — Merge</title>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Car%20Pie%20Menu%22%2C%22short_name%22%3A%22CarPie%22%2C%22display%22%3A%22fullscreen%22%2C%22orientation%22%3A%22landscape%22%2C%22background_color%22%3A%22%23f0f0f5%22%2C%22theme_color%22%3A%22%23f0f0f5%22%7D">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0c0c10;
-  --surface:rgba(255,255,255,0.04);
-  --grid-border:rgba(255,255,255,0.06);
-  --toast-bg:rgba(255,255,255,0.14);
-  --climate:#4fc3f7;
-  --drive:#ffb74d;
-  --media:#ce93d8;
-  --vehicle:#90a4ae;
+  --bg:#f0f0f5;
+  --text:#1a1a2e;
+  --text-secondary:#444;
+  --surface:rgba(0,0,0,0.03);
+  --grid-border:rgba(0,0,0,0.08);
+  --toast-bg:rgba(0,0,0,0.7);
+  --climate:#1a8fc4;
+  --drive:#c47a10;
+  --media:#8e44ad;
+  --vehicle:#607d8b;
 }
 html,body{
   width:100%;height:100%;overflow:hidden;
-  background:var(--bg);color:#fff;
+  background:var(--bg);color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif;
   touch-action:none;user-select:none;-webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
 #fullscreen-overlay{
   position:fixed;inset:0;z-index:1000;
-  background:rgba(0,0,0,0.9);
+  background:rgba(240,240,245,0.95);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   cursor:pointer;gap:8px;
 }
-#fullscreen-overlay h1{font-size:2.2em;margin-bottom:0.1em;font-weight:300;letter-spacing:0.08em}
-#fullscreen-overlay p{font-size:1em;opacity:0.5;font-weight:400}
+#fullscreen-overlay h1{font-size:2.2em;margin-bottom:0.1em;font-weight:200;letter-spacing:0.12em;color:var(--text)}
+#fullscreen-overlay p{font-size:1em;opacity:0.4;font-weight:300;color:var(--text)}
 #fullscreen-overlay.hidden{display:none}
 
 #landscape-warning{
@@ -43,47 +45,146 @@ html,body{
   display:none;align-items:center;justify-content:center;
   flex-direction:column;gap:1em;
 }
-#landscape-warning svg{width:60px;height:60px;fill:#fff;opacity:0.5}
-#landscape-warning p{opacity:0.6;font-size:1.1em}
+#landscape-warning svg{width:60px;height:60px;fill:var(--text);opacity:0.4}
+#landscape-warning p{opacity:0.5;font-size:1.1em;color:var(--text)}
 @media(orientation:portrait){
   #landscape-warning{display:flex}
-  #grid{display:none!important}
+  #app{display:none!important}
 }
 
-#grid{
+/* Status bar */
+#status-bar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  height:28px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  background:rgba(240,240,245,0.9);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,0,0,0.06);
+  font-size:0.72em;font-weight:400;letter-spacing:0.04em;
+  color:rgba(0,0,0,0.45);
+}
+#status-bar .status-left,
+#status-bar .status-right{
+  display:flex;align-items:center;gap:14px;
+}
+#status-bar .status-center{
+  position:absolute;left:50%;transform:translateX(-50%);
+  font-weight:500;color:rgba(0,0,0,0.6);
+}
+.status-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:#4caf50;display:inline-block;
+}
+.battery-icon{
+  display:inline-flex;align-items:center;gap:3px;
+}
+.battery-bar{
+  width:18px;height:9px;border:1px solid rgba(0,0,0,0.3);
+  border-radius:2px;position:relative;
+  padding:1px;
+}
+.battery-bar::after{
+  content:'';display:block;
+  width:70%;height:100%;
+  background:rgba(0,0,0,0.35);
+  border-radius:1px;
+}
+.battery-bar::before{
+  content:'';position:absolute;
+  right:-3px;top:50%;transform:translateY(-50%);
+  width:2px;height:4px;
+  background:rgba(0,0,0,0.25);
+  border-radius:0 1px 1px 0;
+}
+
+#app{
   width:100%;height:100%;
+  display:flex;flex-direction:column;
+}
+
+/* 4 tall columns — from Columns layout, below status bar */
+#grid{
+  flex:1;
   display:grid;
-  grid-template-columns:1fr 1fr;
-  grid-template-rows:1fr 1fr;
-  gap:1px;
-  background:var(--grid-border);
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  grid-template-rows:1fr;
+  gap:0;
+  margin-top:28px;
 }
 .region{
   position:relative;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;overflow:hidden;
+  gap:8px;overflow:hidden;
   cursor:pointer;
-  transition:background 0.2s;
+  transition:background 0.25s;
 }
-.region:active{background:rgba(255,255,255,0.06)!important}
-.region-icon{font-size:2.8em;opacity:0.7;pointer-events:none;filter:grayscale(0.2)}
-.region-label{font-size:1.1em;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;opacity:0.85;pointer-events:none}
-.region-state{font-size:0.9em;opacity:0.55;margin-top:2px;pointer-events:none;min-height:1.1em;font-weight:400;letter-spacing:0.02em}
-.hint{
-  position:absolute;font-size:1.2em;opacity:0.35;
-  pointer-events:none;text-align:center;white-space:nowrap;
-  transform:translate(-50%,-50%);font-weight:400;
+.region:active{background:rgba(0,0,0,0.04)!important}
+
+/* Vertical separators */
+.region + .region{
+  border-left:1px solid rgba(0,0,0,0.06);
 }
 
-.region[data-region="climate"]{background:color-mix(in srgb,var(--climate) 12%,var(--bg))}
-.region[data-region="drive"]{background:color-mix(in srgb,var(--drive) 12%,var(--bg))}
-.region[data-region="media"]{background:color-mix(in srgb,var(--media) 12%,var(--bg))}
-.region[data-region="vehicle"]{background:color-mix(in srgb,var(--vehicle) 10%,var(--bg))}
+/* Subtle gradient tinting */
+.region[data-region="climate"]{
+  background:linear-gradient(to bottom,
+    color-mix(in srgb, var(--climate) 8%, var(--bg)) 0%,
+    color-mix(in srgb, var(--climate) 3%, var(--bg)) 50%,
+    var(--bg) 100%);
+}
+.region[data-region="drive"]{
+  background:linear-gradient(to bottom,
+    color-mix(in srgb, var(--drive) 8%, var(--bg)) 0%,
+    color-mix(in srgb, var(--drive) 3%, var(--bg)) 50%,
+    var(--bg) 100%);
+}
+.region[data-region="media"]{
+  background:linear-gradient(to bottom,
+    color-mix(in srgb, var(--media) 8%, var(--bg)) 0%,
+    color-mix(in srgb, var(--media) 3%, var(--bg)) 50%,
+    var(--bg) 100%);
+}
+.region[data-region="vehicle"]{
+  background:linear-gradient(to bottom,
+    color-mix(in srgb, var(--vehicle) 6%, var(--bg)) 0%,
+    color-mix(in srgb, var(--vehicle) 2%, var(--bg)) 50%,
+    var(--bg) 100%);
+}
+
+.region-icon{
+  font-size:4em;
+  opacity:0.75;
+  pointer-events:none;
+  filter:grayscale(0.1);
+  line-height:1;
+}
+.region-label{
+  font-size:0.92em;
+  font-weight:500;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  opacity:0.85;
+  pointer-events:none;
+  color:var(--text);
+}
+.region-state{
+  position:absolute;bottom:12%;left:50%;transform:translateX(-50%);
+  font-size:1.15em;
+  pointer-events:none;
+  min-height:1.1em;
+  font-weight:400;
+  letter-spacing:0.03em;
+  color:var(--text-secondary);
+  text-align:center;white-space:nowrap;
+  max-width:90%;overflow:hidden;text-overflow:ellipsis;
+}
 
 /* Pie menu */
 #pie-overlay{
   position:fixed;inset:0;z-index:100;display:none;
-  background:rgba(0,0,0,0.4);
+  background:rgba(240,240,245,0.6);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
 }
 #pie-overlay.active{display:block}
 #pie-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
@@ -91,10 +192,10 @@ html,body{
 /* Toast */
 #toast{
   position:fixed;bottom:40px;left:50%;transform:translateX(-50%);
-  background:rgba(255,255,255,0.12);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.08);
+  background:var(--toast-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(0,0,0,0.1);
   color:#fff;padding:10px 28px;border-radius:24px;
-  font-size:0.9em;font-weight:500;letter-spacing:0.03em;
+  font-size:0.85em;font-weight:400;letter-spacing:0.04em;
   opacity:0;transition:opacity 0.25s;
   z-index:200;pointer-events:none;white-space:nowrap;
 }
@@ -119,26 +220,42 @@ html,body{
   <p>Please rotate to landscape</p>
 </div>
 
-<div id="grid">
-  <div class="region" data-region="climate">
-    <span class="region-icon">&#10052;</span>
-    <span class="region-label">Climate</span>
-    <span class="region-state" id="state-climate">22 °C · Auto</span>
+<div id="status-bar">
+  <div class="status-left">
+    <span class="status-dot"></span>
+    <span>LTE</span>
+    <span>GPS</span>
   </div>
-  <div class="region" data-region="drive">
-    <span class="region-icon">&#128161;</span>
-    <span class="region-label">Drive</span>
-    <span class="region-state" id="state-drive">Lights: Auto · Locked</span>
+  <div class="status-center" id="status-time">12:00</div>
+  <div class="status-right">
+    <span>21 °C</span>
+    <span>274 km</span>
+    <span class="battery-icon"><span class="battery-bar"></span></span>
   </div>
-  <div class="region" data-region="media">
-    <span class="region-icon">&#9835;</span>
-    <span class="region-label">Media</span>
-    <span class="region-state" id="state-media">Vol: 40% · ▶ · Bluetooth</span>
-  </div>
-  <div class="region" data-region="vehicle">
-    <span class="region-icon">&#9881;</span>
-    <span class="region-label">Vehicle</span>
-    <span class="region-state" id="state-vehicle">Seat heat: Off</span>
+</div>
+
+<div id="app">
+  <div id="grid">
+    <div class="region" data-region="climate">
+      <span class="region-icon">&#10052;</span>
+      <span class="region-label">Climate</span>
+      <span class="region-state" id="state-climate">22 °C · Auto</span>
+    </div>
+    <div class="region" data-region="drive">
+      <span class="region-icon">&#128161;</span>
+      <span class="region-label">Drive</span>
+      <span class="region-state" id="state-drive">Lights: Auto · Locked</span>
+    </div>
+    <div class="region" data-region="media">
+      <span class="region-icon">&#9835;</span>
+      <span class="region-label">Media</span>
+      <span class="region-state" id="state-media">Vol: 40% · ▶ · Bluetooth</span>
+    </div>
+    <div class="region" data-region="vehicle">
+      <span class="region-icon">&#9881;</span>
+      <span class="region-label">Vehicle</span>
+      <span class="region-state" id="state-vehicle">Seat heat: Off</span>
+    </div>
   </div>
 </div>
 
@@ -151,6 +268,16 @@ html,body{
 <script>
 'use strict';
 
+// ── Status bar clock ──────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours().toString().padStart(2, '0');
+  const m = now.getMinutes().toString().padStart(2, '0');
+  document.getElementById('status-time').textContent = `${h}:${m}`;
+}
+updateClock();
+setInterval(updateClock, 10000);
+
 // ── State ──────────────────────────────────────────────
 const state = {
   climate: { temp: 22, fan: 3, ac: true, auto: true, defrostF: false, defrostR: false },
@@ -161,66 +288,61 @@ const state = {
 
 // ── Region definitions ─────────────────────────────────
 const regions = {
-  // Default offset = -(360/n)/2, centers sector 0 at top (0°)
-  // 8 items → sectors at compass directions: ↑ ↗ → ↘ ↓ ↙ ← ↖
   climate: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--climate').trim(),
     options: [
-      { label: 'Temp +', icon: '🔺' },   // ↑
-      { label: 'Fan +', icon: '💨' },     // ↗
-      { label: 'AC', icon: '❄' },         // →
-      { label: 'Defrost F', icon: '▓' },  // ↘
-      { label: 'Temp −', icon: '🔻' },    // ↓
-      { label: 'Fan −', icon: '🌬' },     // ↙
-      { label: 'Auto', icon: 'Ⓐ' },      // ←
-      { label: 'Defrost R', icon: '▒' },  // ↖
+      { label: 'Temp +', icon: '🔺' },
+      { label: 'Fan +', icon: '💨' },
+      { label: 'AC', icon: '❄' },
+      { label: 'Defrost F', icon: '▓' },
+      { label: 'Temp −', icon: '🔻' },
+      { label: 'Fan −', icon: '🌬' },
+      { label: 'Auto', icon: 'Ⓐ' },
+      { label: 'Defrost R', icon: '▒' },
     ],
   },
   drive: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--drive').trim(),
-    // Driving + Doors merged — 8 items at compass directions
     options: [
-      { label: 'Headlights', icon: '💡' }, // ↑
-      { label: 'High beam', icon: '🔆' },  // ↗
-      { label: 'Right', icon: '▶' },       // →
-      { label: 'Hazards', icon: '⚠' },     // ↘
-      { label: 'Wipers', icon: '🌧' },     // ↓
-      { label: 'Trunk', icon: '📦' },      // ↙
-      { label: 'Left', icon: '◀' },        // ←
-      { label: 'Lock', icon: '🔒' },       // ↖
+      { label: 'Headlights', icon: '💡' },
+      { label: 'High beam', icon: '🔆' },
+      { label: 'Right', icon: '▶' },
+      { label: 'Hazards', icon: '⚠' },
+      { label: 'Wipers', icon: '🌧' },
+      { label: 'Trunk', icon: '📦' },
+      { label: 'Left', icon: '◀' },
+      { label: 'Lock', icon: '🔒' },
     ],
   },
   media: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--media').trim(),
-    // Music + Navigation merged — 8 items at compass directions
     options: [
-      { label: 'Vol +', icon: '🔊' },      // ↑
-      { label: 'Next', icon: '⏭' },        // ↗
-      { label: 'Source', icon: '📡' },      // →
-      { label: 'Nav audio', icon: '🔈' },  // ↘
-      { label: 'Vol −', icon: '🔉' },       // ↓
-      { label: 'Prev', icon: '⏮' },        // ↙
-      { label: 'Recenter', icon: '◎' },    // ←
-      { label: 'Play/Pause', icon: '⏯' },  // ↖
+      { label: 'Vol +', icon: '🔊' },
+      { label: 'Next', icon: '⏭' },
+      { label: 'Source', icon: '📡' },
+      { label: 'Nav audio', icon: '🔈' },
+      { label: 'Vol −', icon: '🔉' },
+      { label: 'Prev', icon: '⏮' },
+      { label: 'Recenter', icon: '◎' },
+      { label: 'Play/Pause', icon: '⏯' },
     ],
   },
   vehicle: {
     color: getComputedStyle(document.documentElement).getPropertyValue('--vehicle').trim(),
-    // 4 items → sectors at ↑ → ↓ ←
     options: [
-      { label: 'Seat heat', icon: '🔥' },  // ↑
-      { label: 'Camera', icon: '📷' },     // →
-      { label: 'Settings', icon: '⚙' },   // ↓
-      { label: 'Mirrors', icon: '🪞' },    // ←
+      { label: 'Seat heat', icon: '🔥' },
+      { label: 'Camera', icon: '📷' },
+      { label: 'Settings', icon: '⚙' },
+      { label: 'Mirrors', icon: '🪞' },
     ],
   },
 };
 
-// ── Constants ──────────────────────────────────────────
-const INNER_R = 50;
-const OUTER_R = 140;
-const LABEL_R = 98;
-const DEAD_ZONE = 30;
+// ── Constants — reduced radii for narrower columns (from Columns) ──
+const INNER_R = 55;
+const OUTER_R = 160;
+const LABEL_R = 110;
+const DEAD_ZONE = 12;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 // ── DOM refs ───────────────────────────────────────────
@@ -298,8 +420,8 @@ function showPie(regionName, cx, cy) {
     const path = createSVGElement('path', {
       d,
       fill: reg.color,
-      'fill-opacity': '0.25',
-      stroke: 'rgba(255,255,255,0.15)',
+      'fill-opacity': '0.2',
+      stroke: 'rgba(0,0,0,0.08)',
       'stroke-width': '0.5',
       'data-index': i,
       class: 'pie-sector',
@@ -310,25 +432,25 @@ function showPie(regionName, cx, cy) {
     const lp = polarToCartesian(cx, cy, LABEL_R, midAngle);
 
     const icon = createSVGElement('text', {
-      x: lp.x, y: lp.y - 7,
+      x: lp.x, y: lp.y - 9,
       'text-anchor': 'middle',
       'dominant-baseline': 'central',
-      'font-size': '20',
-      fill: '#fff',
+      'font-size': '26',
+      fill: '#1a1a2e',
       'pointer-events': 'none',
-      opacity: '1',
+      opacity: '0.9',
     });
     icon.textContent = opts[i].icon;
     g.appendChild(icon);
 
     const text = createSVGElement('text', {
-      x: lp.x, y: lp.y + 13,
+      x: lp.x, y: lp.y + 15,
       'text-anchor': 'middle',
       'dominant-baseline': 'central',
-      'font-size': '10',
-      'font-weight': '500',
+      'font-size': '12',
+      'font-weight': '600',
       'letter-spacing': '0.05em',
-      fill: '#fff',
+      fill: '#1a1a2e',
       'pointer-events': 'none',
       opacity: '0.85',
     });
@@ -337,9 +459,9 @@ function showPie(regionName, cx, cy) {
   }
 
   const center = createSVGElement('circle', {
-    cx, cy, r: INNER_R - 6,
-    fill: 'rgba(12,12,16,0.8)',
-    stroke: 'rgba(255,255,255,0.1)',
+    cx, cy, r: INNER_R - 5,
+    fill: 'rgba(255,255,255,0.85)',
+    stroke: 'rgba(0,0,0,0.08)',
     'stroke-width': '0.5',
   });
   g.appendChild(center);
@@ -348,10 +470,10 @@ function showPie(regionName, cx, cy) {
     x: cx, y: cy,
     'text-anchor': 'middle',
     'dominant-baseline': 'central',
-    'font-size': '10',
-    'font-weight': '400',
+    'font-size': '12',
+    'font-weight': '500',
     'letter-spacing': '0.05em',
-    fill: 'rgba(255,255,255,0.5)',
+    fill: 'rgba(0,0,0,0.55)',
     id: 'pie-center-label',
     'pointer-events': 'none',
   });
@@ -374,7 +496,7 @@ function updateHighlight(px, py) {
 
   if (dist < DEAD_ZONE) {
     if (activePie.highlighted !== -1) {
-      sectors.forEach(s => { s.setAttribute('fill-opacity', '0.25'); });
+      sectors.forEach(s => { s.setAttribute('fill-opacity', '0.2'); });
       activePie.highlighted = -1;
       if (centerLabel) centerLabel.textContent = '✕';
     }
@@ -393,7 +515,7 @@ function updateHighlight(px, py) {
   if (idx !== activePie.highlighted) {
     if (navigator.vibrate) navigator.vibrate(8);
     sectors.forEach((s, i) => {
-      s.setAttribute('fill-opacity', i === idx ? '0.6' : '0.15');
+      s.setAttribute('fill-opacity', i === idx ? '0.45' : '0.1');
     });
     activePie.highlighted = idx;
     if (centerLabel) centerLabel.textContent = activePie.options[idx].label;
@@ -447,7 +569,7 @@ function handleAction(region, action) {
       if (action === 'Vol +') s.vol = Math.min(100, s.vol + 5);
       else if (action === 'Vol −') s.vol = Math.max(0, s.vol - 5);
       else if (action === 'Play/Pause') s.playing = !s.playing;
-      else if (action === 'Next' || action === 'Prev') {} // no state change for demo
+      else if (action === 'Next' || action === 'Prev') {}
       else if (action === 'Source') {
         const sources = ['Bluetooth', 'Radio', 'USB', 'AUX'];
         s.source = sources[(sources.indexOf(s.source) + 1) % sources.length];
@@ -480,32 +602,6 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1500);
 }
-
-// ── Directional hints ─────────────────────────────────
-function renderHints() {
-  document.querySelectorAll('.hint').forEach(el => el.remove());
-  for (const [name, reg] of Object.entries(regions)) {
-    const cell = document.querySelector(`.region[data-region="${name}"]`);
-    if (!cell) continue;
-    const w = cell.offsetWidth, h = cell.offsetHeight;
-    const opts = reg.options, n = opts.length;
-    const sliceAngle = 360 / n;
-    const offset = reg.offset !== undefined ? reg.offset : -sliceAngle / 2;
-    const rx = w * 0.35, ry = h * 0.35;
-    for (let i = 0; i < n; i++) {
-      const midAngle = i * sliceAngle + offset + sliceAngle / 2;
-      const a = (midAngle - 90) * Math.PI / 180;
-      const hint = document.createElement('div');
-      hint.className = 'hint';
-      hint.style.left = (w / 2 + rx * Math.cos(a)) + 'px';
-      hint.style.top = (h / 2 + ry * Math.sin(a)) + 'px';
-      hint.style.color = reg.color;
-      hint.textContent = `${opts[i].icon} ${opts[i].label}`;
-      cell.appendChild(hint);
-    }
-  }
-}
-window.addEventListener('resize', renderHints);
 
 // ── Event handling ─────────────────────────────────────
 function getRegionFromElement(el) {
@@ -563,7 +659,6 @@ document.addEventListener('mouseup', e => {
 
 // ── Init ───────────────────────────────────────────────
 updateStateDisplays();
-renderHints();
 </script>
 </body>
 </html>
